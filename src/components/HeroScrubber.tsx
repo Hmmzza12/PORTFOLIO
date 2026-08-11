@@ -172,7 +172,6 @@ export default function HeroScrubber() {
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_48%,rgba(10,10,12,0.6)_100%)]" />
 
         {/* ================= STAGED SCROLL COPY ================= */}
-        {/* NOTE: placeholder bio — replace the text in stages 1 & 2 with your own. */}
 
         {/* Stage 0 — Title */}
         <div
@@ -207,7 +206,7 @@ export default function HeroScrubber() {
           </motion.div>
         </div>
 
-        {/* Stage 1 — Who (placeholder) */}
+        {/* Stage 1 — Who */}
         <div
           ref={stage1Ref}
           className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
@@ -223,13 +222,13 @@ export default function HeroScrubber() {
               Hi, I&apos;m Hamza Touaban.
             </h2>
             <p className="mx-auto mt-5 max-w-xl font-body text-lg text-ink/80 text-balance">
-              A full-stack software engineer who designs resilient, secure
-              backends and crafts cinematic, high-performance web experiences.
+              Full-stack engineer architecting bulletproof backends and
+              high-performance, cinematic web applications.
             </p>
           </div>
         </div>
 
-        {/* Stage 2 — What (placeholder) */}
+        {/* Stage 2 — What */}
         <div
           ref={stage2Ref}
           className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
@@ -242,11 +241,12 @@ export default function HeroScrubber() {
               {"// what I do"}
             </span>
             <h2 className="mt-4 font-display text-[clamp(1.8rem,5.5vw,4rem)] font-bold leading-[1.02] text-ink text-balance">
-              I build it end to end.
+              Full-stack architecture, end to end
             </h2>
             <p className="mx-auto mt-5 max-w-xl font-body text-lg text-ink/80 text-balance">
-              From JWT-secured REST APIs and database architecture to 60&nbsp;FPS
-              canvas-driven front ends — I own the whole stack, schema to pixel.
+              From JWT-authenticated Spring Boot APIs to fluid React
+              frontends—I craft robust systems from database schema to final
+              pixel.
             </p>
           </div>
         </div>

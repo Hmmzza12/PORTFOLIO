@@ -5,8 +5,12 @@ import { Github, Linkedin, Mail, ArrowUpRight } from "lucide-react";
 
 const LINKS = [
   { label: "Email", href: "mailto:hamzatouaban11@gmail.com", icon: Mail },
-  { label: "GitHub", href: "https://github.com", icon: Github },
-  { label: "LinkedIn", href: "https://linkedin.com", icon: Linkedin },
+  { label: "GitHub", href: "https://github.com/Hmmzza12", icon: Github },
+  {
+    label: "LinkedIn",
+    href: "https://www.linkedin.com/in/hamza-touaban-2a0241257/",
+    icon: Linkedin,
+  },
 ];
 
 export default function ContactFooter() {

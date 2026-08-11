@@ -4,7 +4,16 @@ import { useEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { AnimatePresence, motion } from "framer-motion";
-import { Layers, ArrowLeftRight, X, Lock, Cpu, ArrowRight } from "lucide-react";
+import {
+  Layers,
+  ArrowLeftRight,
+  X,
+  Lock,
+  Cpu,
+  ArrowRight,
+  Github,
+  ExternalLink,
+} from "lucide-react";
 import { projects, type Project } from "@/data/projects";
 
 const methodColor: Record<string, string> = {
@@ -148,7 +157,7 @@ function ProjectCard({ project }: { project: Project }) {
           <h3 className="mt-2 font-display text-3xl font-bold text-ink md:text-4xl">
             {project.title}
           </h3>
-          <p className="mt-4 max-w-md text-sm leading-relaxed text-muted md:text-base">
+          <p className="mt-4 max-w-md text-sm leading-relaxed text-ink/75 md:text-[1rem]">
             {project.description}
           </p>
         </div>
@@ -182,15 +191,40 @@ function ProjectCard({ project }: { project: Project }) {
           ))}
         </div>
 
-        {/* Architecture toggle */}
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="mt-auto inline-flex w-fit items-center gap-2 rounded-lg border border-accent/40 px-4 py-2.5 font-mono text-sm text-accent transition-all hover:bg-accent/10 hover:shadow-glow"
-        >
-          <Layers className="h-4 w-4" />
-          Architecture View
-        </button>
+        {/* Actions: Live · Code · Architecture */}
+        <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-6">
+          <a
+            href={project.liveUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 font-mono text-sm font-semibold transition-all hover:shadow-glow"
+            style={{ backgroundColor: project.accent, color: "#0A0A0C" }}
+          >
+            <ExternalLink className="h-4 w-4" />
+            Live Demo
+          </a>
+          <a
+            href={project.repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-white/15 bg-white/[0.03] px-4 py-2.5 font-mono text-sm text-ink/85 transition-all hover:border-white/30 hover:text-ink"
+          >
+            <Github className="h-4 w-4" />
+            Code
+          </a>
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-lg border px-4 py-2.5 font-mono text-sm transition-all hover:shadow-glow"
+            style={{
+              borderColor: `${project.accent}66`,
+              color: project.accent,
+            }}
+          >
+            <Layers className="h-4 w-4" />
+            Architecture
+          </button>
+        </div>
       </div>
 
       {/* Expandable Architecture overlay (kept absolute so the horizontal track width stays stable) */}
@@ -229,7 +263,7 @@ function ProjectCard({ project }: { project: Project }) {
                 <ul className="space-y-2">
                   {project.apiRoutes.map((r) => (
                     <li
-                      key={r.path}
+                      key={`${r.method} ${r.path}`}
                       className="rounded-lg border border-white/10 bg-white/[0.02] p-2.5"
                     >
                       <div className="flex items-center gap-2">
