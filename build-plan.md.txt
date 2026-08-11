@@ -1,0 +1,25 @@
+# Portfolio Build Plan & Architecture
+
+## Site Flow & Sections
+
+1. **Preloader / Splash Screen (`Preloader.tsx`)**
+   - Full-screen dark backdrop (`#0A0A0C`).
+   - Monospaced initialization terminal output.
+   - Session storage check to skip on repeat visits during the same session.
+   - Smooth curtain-raise exit animation.
+
+2. **Hero Video Scrubber (`HeroScrubber.tsx`)**
+   - Viewport pinned using GSAP ScrollTrigger.
+   - Canvas-based WebP frame sequence scrubbing from `/public/frames`.
+   - Overlay title: *"FULL-STACK SOFTWARE ENGINEER"*.
+
+3. **LED Matrix / Skill Showcase (`LedMatrix.tsx`)**
+   - Dynamic 2D canvas grid with interactive glowing dot effects.
+   - Displays core stack highlights: Spring Boot, React, TypeScript, JWT Auth.
+
+4. **Projects Horizontal Gallery (`ProjectShowcase.tsx`)**
+   - Pins vertical scroll to sweep horizontally through project cards.
+   - Interactive toggle to expand 3D architecture diagrams and tech stack specs.
+
+5. **Tech Architecture Breakdown (`ArchitectureView.tsx`)**
+   - Interactive nodes mapping frontend handshakes to backend REST APIs.

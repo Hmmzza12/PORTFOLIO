@@ -1,0 +1,113 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a0a0c;
+  --accent: #ff1e42;
+  --slate: #1e1e24;
+  --ink: #f4f4f6;
+  --muted: #8a8a93;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+  background-color: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  font-family: var(--font-inter), system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom neon scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0c;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a2a32;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+::selection {
+  background: rgba(255, 30, 66, 0.3);
+  color: #fff;
+}
+
+@layer components {
+  /* Glassmorphism container per brand kit */
+  .glass {
+    background: rgba(30, 30, 36, 0.45);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-strong {
+    background: rgba(20, 20, 24, 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .neon-text {
+    text-shadow: 0 0 18px rgba(255, 30, 66, 0.55), 0 0 40px rgba(255, 30, 66, 0.25);
+  }
+
+  .neon-border {
+    border: 1px solid rgba(255, 30, 66, 0.5);
+    box-shadow: 0 0 20px rgba(255, 30, 66, 0.2), inset 0 0 12px rgba(255, 30, 66, 0.08);
+  }
+
+  .grid-backdrop {
+    background-image:
+      linear-gradient(to right, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+}
+
+@layer utilities {
+  .will-pin {
+    will-change: transform;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Hide scrollbar in horizontal tracks while keeping scroll functional */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

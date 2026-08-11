@@ -1,0 +1,18 @@
+# Brand Kit & Theme Specifications
+
+## Color Palette
+- **Primary Dark Background:** `#0A0A0C`
+- **Accent Neon Highlight:** `#FF1E42`
+- **Muted Slate / Containers:** `#1E1E24`
+- **Main Text:** `#F4F4F6`
+- **Subtext / Muted Text:** `#8A8A93`
+
+## Typography
+- **Display / Headers:** `Space Grotesk`, sans-serif
+- **Monospace / Terminal / Stats:** `JetBrains Mono`, monospace
+- **Body Text:** Inter, sans-serif
+
+## UI Design Vibe
+- Cyberpunk / Dark Mode Tech Aesthetic
+- High-contrast neon glows (`box-shadow: 0 0 20px #FF1E4233`)
+- Glassmorphism containers (`backdrop-filter: blur(12px)`)
