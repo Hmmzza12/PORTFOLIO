@@ -13,46 +13,30 @@ const BOOT_LINES = [
 // Progress thresholds at which each line becomes visible.
 const LINE_AT = [0, 26, 54, 100];
 
-const SESSION_KEY = "portfolio_preloaded";
+// Accent flips from neon red to neon green the moment we hit 100%.
+const RED = "#FF1E42";
+const GREEN = "#22F58E";
 
 type Props = {
-  /** Called once the preloader has finished (or was skipped) so the shell can enable scroll. */
+  /** Called once the preloader has finished so the shell can enable scroll. */
   onComplete?: () => void;
 };
 
 export default function Preloader({ onComplete }: Props) {
-  // `mounted` avoids a hydration flash: we render the overlay on the server,
-  // then immediately resolve the real state on the client.
   const [visible, setVisible] = useState(true);
   const [progress, setProgress] = useState(0);
   const [linesShown, setLinesShown] = useState(1);
+  const [complete, setComplete] = useState(false);
   const doneRef = useRef(false);
 
   const finish = () => {
     if (doneRef.current) return;
     doneRef.current = true;
-    try {
-      sessionStorage.setItem(SESSION_KEY, "1");
-    } catch {
-      /* sessionStorage may be unavailable (private mode) — ignore. */
-    }
     onComplete?.();
   };
 
   useEffect(() => {
-    // Returning visitor in the same session — skip instantly.
-    let alreadySeen = false;
-    try {
-      alreadySeen = sessionStorage.getItem(SESSION_KEY) === "1";
-    } catch {
-      alreadySeen = false;
-    }
-
-    if (alreadySeen) {
-      setVisible(false);
-      finish();
-      return;
-    }
+    // Always play the full splash on every load / reload — no session skip.
 
     // Lock scroll while the preloader is on screen.
     const prevOverflow = document.body.style.overflow;
@@ -77,9 +61,10 @@ export default function Preloader({ onComplete }: Props) {
       if (pct < 100) {
         raf = requestAnimationFrame(tick);
       } else {
+        setComplete(true); // red -> green
         finish();
-        // Hold the "SYSTEM READY" state briefly, then raise the curtain.
-        window.setTimeout(() => setVisible(false), reduceMotion ? 150 : 520);
+        // Hold the green "SYSTEM READY" state briefly, then raise the curtain.
+        window.setTimeout(() => setVisible(false), reduceMotion ? 220 : 800);
       }
     };
     raf = requestAnimationFrame(tick);
@@ -98,6 +83,12 @@ export default function Preloader({ onComplete }: Props) {
     }
   }, [visible]);
 
+  const accent = complete ? GREEN : RED;
+  const accentGlow = complete
+    ? "0 0 18px rgba(34,245,142,0.6), 0 0 40px rgba(34,245,142,0.28)"
+    : "0 0 18px rgba(255,30,66,0.55), 0 0 40px rgba(255,30,66,0.25)";
+  const colorTransition = "color .45s ease, text-shadow .45s ease";
+
   return (
     <AnimatePresence>
       {visible && (
@@ -111,14 +102,36 @@ export default function Preloader({ onComplete }: Props) {
           {/* faint grid + scanline ambience */}
           <div className="grid-backdrop pointer-events-none absolute inset-0 opacity-60" />
           <div className="pointer-events-none absolute inset-0 overflow-hidden">
-            <div className="animate-scan-down absolute inset-x-0 h-40 bg-gradient-to-b from-transparent via-accent/5 to-transparent" />
+            <div
+              className="animate-scan-down absolute inset-x-0 h-40 bg-gradient-to-b from-transparent to-transparent"
+              style={{
+                // subtle moving light in the current accent hue
+                backgroundImage: `linear-gradient(to bottom, transparent, ${accent}14, transparent)`,
+                transition: "background-image .45s ease",
+              }}
+            />
           </div>
 
           <div className="relative w-[min(560px,90vw)]">
             {/* Terminal window */}
-            <div className="glass-strong overflow-hidden rounded-xl shadow-glow-lg">
+            <div
+              className="glass-strong overflow-hidden rounded-xl"
+              style={{
+                boxShadow: complete
+                  ? "0 0 45px rgba(34,245,142,0.28)"
+                  : "0 0 45px rgba(255,30,66,0.25)",
+                transition: "box-shadow .5s ease",
+              }}
+            >
               <div className="flex items-center gap-2 border-b border-white/10 bg-white/[0.03] px-4 py-3">
-                <span className="h-3 w-3 rounded-full bg-accent/80" />
+                <span
+                  className="h-3 w-3 rounded-full"
+                  style={{
+                    backgroundColor: accent,
+                    opacity: 0.85,
+                    transition: "background-color .45s ease",
+                  }}
+                />
                 <span className="h-3 w-3 rounded-full bg-muted/50" />
                 <span className="h-3 w-3 rounded-full bg-muted/30" />
                 <span className="ml-3 font-mono text-xs tracking-widest text-muted">
@@ -136,16 +149,25 @@ export default function Preloader({ onComplete }: Props) {
                       initial={{ opacity: 0, x: -8 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ duration: 0.25 }}
-                      className={
+                      style={
                         isReady
-                          ? "text-accent neon-text"
-                          : "text-ink/90"
+                          ? { color: accent, textShadow: accentGlow, transition: colorTransition }
+                          : undefined
                       }
+                      className={isReady ? "" : "text-ink/90"}
                     >
-                      <span className="mr-2 text-accent">{">"}</span>
+                      <span
+                        className="mr-2"
+                        style={{ color: accent, transition: colorTransition }}
+                      >
+                        {">"}
+                      </span>
                       {line}
                       {isLast && !isReady && (
-                        <span className="animate-caret-blink ml-1 text-accent">
+                        <span
+                          className="animate-caret-blink ml-1"
+                          style={{ color: accent }}
+                        >
                           _
                         </span>
                       )}
@@ -159,12 +181,25 @@ export default function Preloader({ onComplete }: Props) {
             <div className="mt-5 flex items-center gap-4">
               <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-slate">
                 <motion.div
-                  className="h-full rounded-full bg-accent shadow-glow"
-                  style={{ width: `${progress}%` }}
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${progress}%`,
+                    backgroundColor: accent,
+                    boxShadow: complete
+                      ? "0 0 20px rgba(34,245,142,0.5)"
+                      : "0 0 20px rgba(255,30,66,0.35)",
+                    transition: "background-color .45s ease, box-shadow .45s ease",
+                  }}
                   transition={{ ease: "linear" }}
                 />
               </div>
-              <span className="w-14 text-right font-mono text-xs tabular-nums text-muted">
+              <span
+                className="w-14 text-right font-mono text-xs tabular-nums"
+                style={{
+                  color: complete ? GREEN : "#8A8A93",
+                  transition: colorTransition,
+                }}
+              >
                 {progress.toString().padStart(3, "0")}%
               </span>
             </div>
