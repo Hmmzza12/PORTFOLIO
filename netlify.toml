@@ -1,0 +1,8 @@
+# Netlify configuration for the Next.js portfolio.
+# Netlify auto-detects Next.js and installs its Next runtime automatically;
+# here we just pin the Node version and build command for reproducible deploys.
+[build]
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "20"
