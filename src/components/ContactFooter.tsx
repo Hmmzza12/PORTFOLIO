@@ -49,10 +49,8 @@ export default function ContactFooter() {
                 <a
                   key={l.label}
                   href={l.href}
-                  target={l.href.startsWith("http") ? "_blank" : undefined}
-                  rel={
-                    l.href.startsWith("http") ? "noopener noreferrer" : undefined
-                  }
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="group inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.03] px-5 py-2.5 font-mono text-sm text-ink/85 transition-all hover:border-accent/50 hover:text-accent hover:shadow-glow"
                 >
                   <Icon className="h-4 w-4" />
