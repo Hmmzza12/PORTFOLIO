@@ -66,7 +66,7 @@ export default function ContactFooter() {
           <span>© {new Date().getFullYear()} Hamza Touaban</span>
           <span className="flex items-center gap-2">
             <span className="h-1.5 w-1.5 animate-pulse-glow rounded-full bg-emerald-400" />
-            Built with Next.js · GSAP · Framer Motion
+            Available for new projects
           </span>
         </div>
       </div>
