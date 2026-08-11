@@ -6,9 +6,13 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { motion } from "framer-motion";
 import { ChevronDown, Terminal } from "lucide-react";
 
-const FRAME_COUNT = 240;
+const FRAME_COUNT = 173;
 const framePath = (i: number) =>
   `/frames/frame_${String(i).padStart(4, "0")}.webp`;
+
+// clamp helper + linear ramp (0..1) for p between a and b
+const clamp01 = (v: number) => Math.max(0, Math.min(1, v));
+const ramp = (p: number, a: number, b: number) => clamp01((p - a) / (b - a));
 
 export default function HeroScrubber() {
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -16,6 +20,12 @@ export default function HeroScrubber() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const frameRef = useRef({ i: 0 });
+
+  // Staged copy blocks revealed across the scroll.
+  const stage0Ref = useRef<HTMLDivElement>(null);
+  const stage1Ref = useRef<HTMLDivElement>(null);
+  const stage2Ref = useRef<HTMLDivElement>(null);
+
   const [loaded, setLoaded] = useState(0);
   const [ready, setReady] = useState(false);
 
@@ -29,7 +39,6 @@ export default function HeroScrubber() {
       if (cancelled) return;
       count += 1;
       setLoaded(count);
-      // Draw the first frame as soon as it is available.
       if (count === 1) drawFrame(0);
       if (count === FRAME_COUNT) setReady(true);
     };
@@ -38,7 +47,7 @@ export default function HeroScrubber() {
       const img = new Image();
       img.decoding = "async";
       img.onload = onOne;
-      img.onerror = onOne; // don't stall the loader on a missing frame
+      img.onerror = onOne;
       img.src = framePath(i + 1);
       images[i] = img;
     }
@@ -50,7 +59,7 @@ export default function HeroScrubber() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // --- Canvas sizing (DPR-aware) + cover draw. ---
+  // --- Canvas cover-draw (DPR-aware). ---
   const drawFrame = (index: number) => {
     const canvas = canvasRef.current;
     const img = imagesRef.current[index];
@@ -63,8 +72,7 @@ export default function HeroScrubber() {
     const iw = img.naturalWidth;
     const ih = img.naturalHeight;
 
-    // object-fit: cover
-    const scale = Math.max(cw / iw, ch / ih);
+    const scale = Math.max(cw / iw, ch / ih); // object-fit: cover
     const dw = iw * scale;
     const dh = ih * scale;
     const dx = (cw - dw) / 2;
@@ -85,29 +93,56 @@ export default function HeroScrubber() {
     drawFrame(frameRef.current.i);
   };
 
-  // --- GSAP ScrollTrigger: pin the hero and scrub the frame index. ---
+  // Drive the staged copy from scroll progress (0..1).
+  const updateStages = (p: number) => {
+    const s0 = stage0Ref.current;
+    const s1 = stage1Ref.current;
+    const s2 = stage2Ref.current;
+    if (!s0 || !s1 || !s2) return;
+
+    // Stage 0 — intro/title: visible at start, exits upward.
+    const out0 = ramp(p, 0.2, 0.34);
+    gsap.set(s0, { opacity: 1 - out0, y: -out0 * 44 });
+
+    // Stage 1 — "who": fades in, holds, exits.
+    const in1 = ramp(p, 0.36, 0.46);
+    const out1 = ramp(p, 0.58, 0.7);
+    gsap.set(s1, { opacity: in1 * (1 - out1), y: (1 - in1) * 40 - out1 * 44 });
+
+    // Stage 2 — "what": fades in and holds to the end.
+    const in2 = ramp(p, 0.72, 0.84);
+    gsap.set(s2, { opacity: in2, y: (1 - in2) * 40 });
+  };
+
+  // --- GSAP ScrollTrigger: pin the hero, scrub frames + copy. ---
   useEffect(() => {
     gsap.registerPlugin(ScrollTrigger);
 
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
 
+    // Hide the later stages before the first scroll update.
+    gsap.set([stage1Ref.current, stage2Ref.current], { opacity: 0 });
+
     const state = frameRef.current;
+    const lastFrame = FRAME_COUNT - 1;
 
     const anim = gsap.to(state, {
-      i: FRAME_COUNT - 1,
+      i: lastFrame,
       ease: "none",
-      snap: "i",
       scrollTrigger: {
         trigger: sectionRef.current,
         start: "top top",
-        end: "+=3200",
+        end: "+=4600",
         scrub: 0.6,
-        pin: pinRef.current,
+        pin: sectionRef.current,
         anticipatePin: 1,
         invalidateOnRefresh: true,
       },
-      onUpdate: () => drawFrame(Math.round(state.i)),
+      onUpdate: () => {
+        drawFrame(Math.round(state.i));
+        updateStages(state.i / lastFrame);
+      },
     });
 
     return () => {
@@ -118,7 +153,6 @@ export default function HeroScrubber() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Once all frames are in, recalculate trigger positions.
   useEffect(() => {
     if (ready) ScrollTrigger.refresh();
   }, [ready]);
@@ -127,31 +161,35 @@ export default function HeroScrubber() {
 
   return (
     <section ref={sectionRef} className="relative h-screen">
-      {/* Pinned viewport */}
       <div
         ref={pinRef}
         className="will-pin relative h-screen w-full overflow-hidden bg-base"
       >
         <canvas ref={canvasRef} className="absolute inset-0 block h-full w-full" />
 
-        {/* Cinematic vignette + gradient legibility scrim */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-base/70 via-transparent to-base" />
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_35%,rgba(10,10,12,0.75)_100%)]" />
+        {/* Lightened legibility scrim — lets the video breathe, keeps copy readable */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-base/45 via-base/10 to-base/85" />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_48%,rgba(10,10,12,0.6)_100%)]" />
 
-        {/* Hero typography */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center">
+        {/* ================= STAGED SCROLL COPY ================= */}
+        {/* NOTE: placeholder bio — replace the text in stages 1 & 2 with your own. */}
+
+        {/* Stage 0 — Title */}
+        <div
+          ref={stage0Ref}
+          className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
+        >
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
+            initial={{ opacity: 0, y: 22 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.8, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
             className="flex flex-col items-center"
           >
-            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.28em] text-muted backdrop-blur">
+            <span className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.05] px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.28em] text-muted backdrop-blur">
               <Terminal className="h-3.5 w-3.5 text-accent" />
               Portfolio · v1.0
             </span>
 
-            {/* Glow backdrop behind the title */}
             <div className="relative">
               <div className="absolute inset-0 -z-10 blur-3xl">
                 <div className="mx-auto h-40 w-[80%] rounded-full bg-accent/25" />
@@ -163,14 +201,57 @@ export default function HeroScrubber() {
               </h1>
             </div>
 
-            <p className="mt-6 max-w-xl font-body text-base text-muted sm:text-lg text-balance">
-              Architecting resilient backends and cinematic interfaces —
-              Spring&nbsp;Boot, React &amp; TypeScript, engineered end to end.
+            <p className="mt-6 font-mono text-sm tracking-[0.2em] text-muted">
+              SPRING BOOT · REACT · TYPESCRIPT
             </p>
           </motion.div>
         </div>
 
-        {/* Explore Work scroll CTA */}
+        {/* Stage 1 — Who (placeholder) */}
+        <div
+          ref={stage1Ref}
+          className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
+        >
+          <div className="relative max-w-3xl">
+            <div className="absolute inset-0 -z-10 blur-3xl">
+              <div className="mx-auto h-40 w-[70%] rounded-full bg-accent/15" />
+            </div>
+            <span className="font-mono text-xs uppercase tracking-[0.3em] text-accent">
+              {"// whoami"}
+            </span>
+            <h2 className="mt-4 font-display text-[clamp(1.8rem,5.5vw,4rem)] font-bold leading-[1.02] text-ink text-balance">
+              Hi, I&apos;m Hamza Touaban.
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl font-body text-lg text-ink/80 text-balance">
+              A full-stack software engineer who designs resilient, secure
+              backends and crafts cinematic, high-performance web experiences.
+            </p>
+          </div>
+        </div>
+
+        {/* Stage 2 — What (placeholder) */}
+        <div
+          ref={stage2Ref}
+          className="absolute inset-0 flex flex-col items-center justify-center px-6 text-center"
+        >
+          <div className="relative max-w-3xl">
+            <div className="absolute inset-0 -z-10 blur-3xl">
+              <div className="mx-auto h-40 w-[70%] rounded-full bg-accent/15" />
+            </div>
+            <span className="font-mono text-xs uppercase tracking-[0.3em] text-accent">
+              {"// what I do"}
+            </span>
+            <h2 className="mt-4 font-display text-[clamp(1.8rem,5.5vw,4rem)] font-bold leading-[1.02] text-ink text-balance">
+              I build it end to end.
+            </h2>
+            <p className="mx-auto mt-5 max-w-xl font-body text-lg text-ink/80 text-balance">
+              From JWT-secured REST APIs and database architecture to 60&nbsp;FPS
+              canvas-driven front ends — I own the whole stack, schema to pixel.
+            </p>
+          </div>
+        </div>
+
+        {/* Explore Work scroll CTA (persistent) */}
         <motion.button
           type="button"
           onClick={() =>
@@ -181,7 +262,7 @@ export default function HeroScrubber() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.1, duration: 0.8 }}
-          className="group absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[11px] uppercase tracking-[0.3em] text-muted transition-colors hover:text-ink"
+          className="group absolute bottom-8 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 font-mono text-[11px] uppercase tracking-[0.3em] text-muted transition-colors hover:text-ink"
         >
           Explore Work
           <span className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/[0.03] transition-all group-hover:border-accent group-hover:shadow-glow">
@@ -189,7 +270,7 @@ export default function HeroScrubber() {
           </span>
         </motion.button>
 
-        {/* Frame preloader indicator (fades once ready) */}
+        {/* Frame preloader indicator */}
         {!ready && (
           <div className="absolute bottom-8 right-8 font-mono text-[11px] tracking-widest text-muted">
             <span className="text-accent">◈</span> BUFFERING FRAMES {pct}%
