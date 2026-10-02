@@ -1,7 +1,13 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Github, Linkedin, Mail, ArrowUpRight } from "lucide-react";
+import {
+  Github,
+  Linkedin,
+  Mail,
+  FileText,
+  ArrowUpRight,
+} from "lucide-react";
 
 const LINKS = [
   { label: "Email", href: "mailto:hamzatouaban11@gmail.com", icon: Mail },
@@ -10,6 +16,11 @@ const LINKS = [
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/hamza-touaban-2a0241257/",
     icon: Linkedin,
+  },
+  {
+    label: "View CV",
+    href: "/Hamza_Touaban_CV_EN.pdf",
+    icon: FileText,
   },
 ];
 
