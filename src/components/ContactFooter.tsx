@@ -10,7 +10,11 @@ import {
 } from "lucide-react";
 
 const LINKS = [
-  { label: "Email", href: "mailto:hamzatouaban11@gmail.com", icon: Mail },
+  {
+    label: "Email",
+    href: "https://mail.google.com/mail/?view=cm&fs=1&to=hamzatouaban11%40gmail.com",
+    icon: Mail,
+  },
   { label: "GitHub", href: "https://github.com/Hmmzza12", icon: Github },
   {
     label: "LinkedIn",
