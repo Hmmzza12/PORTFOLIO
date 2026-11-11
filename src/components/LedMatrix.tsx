@@ -4,10 +4,12 @@ import { useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
 const SKILLS = [
-  { name: "Spring Boot", detail: "Microservices · Security" },
-  { name: "React", detail: "Hooks · Canvas · GSAP" },
-  { name: "TypeScript", detail: "Strict · End-to-end types" },
-  { name: "JWT Auth", detail: "OAuth2 · RBAC · Rotation" },
+  { name: "React & Next.js", detail: "Vite · Tailwind · Canvas" },
+  { name: "Node.js", detail: "Express · Fastify · Socket.IO" },
+  { name: "TypeScript", detail: "Strict · Full-stack types" },
+  { name: "Java & Spring Boot", detail: "REST APIs · Security" },
+  { name: "SQL & Databases", detail: "Turso · PostgreSQL · Drizzle" },
+  { name: "Auth & DevOps", detail: "JWT · OAuth2 · Docker · Git" },
 ];
 
 const ACCENT = { r: 255, g: 30, b: 66 };
@@ -136,7 +138,7 @@ export default function LedMatrix() {
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {SKILLS.map((skill, i) => (
             <motion.div
               key={skill.name}

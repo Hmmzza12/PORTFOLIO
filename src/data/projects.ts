@@ -6,7 +6,7 @@ export type Project = {
   description: string;
   year: string;
   role: string;
-  liveUrl: string;
+  liveUrl?: string;
   repoUrl: string;
   stack: string[];
   apiRoutes: { method: "GET" | "POST" | "PUT" | "DELETE"; path: string; note: string }[];
@@ -20,19 +20,17 @@ export const projects: Project[] = [
     id: "pulse",
     index: "01",
     title: "Pulse",
-    tagline: "Reddit-inspired social platform",
+    tagline: "Real-time social platform",
     description:
-      "A full-stack social network with communities, image posts, likes, comments and emoji reactions — plus real-time direct messaging and live notifications over Socket.IO.",
+      "Communities, feeds, posts and direct messaging with real-time notifications, JWT access/refresh authentication and responsive UI.",
     year: "2025",
     role: "Full-Stack Developer",
     liveUrl: "https://socialmediaapplic.netlify.app/",
     repoUrl: "https://github.com/Hmmzza12/SOCIALMEDIA-APP",
     stack: [
-      "React 19",
-      "Vite",
-      "Tailwind CSS",
-      "Express 5",
+      "React",
       "TypeScript",
+      "Express",
       "Socket.IO",
       "Turso",
       "JWT",
@@ -66,7 +64,7 @@ export const projects: Project[] = [
     title: "Forge",
     tagline: "Team project management — a tiny Linear/Jira",
     description:
-      "Organizations, projects, tasks, labels and a drag-and-drop Kanban board — all driven by one Fastify REST API that serves both a React web app and a Commander-based CLI client.",
+      "REST API, web app and CLI for organizations, tasks, Kanban boards and RBAC — with secure token flows and 66 API integration tests.",
     year: "2025",
     role: "Full-Stack Developer",
     liveUrl: "https://forgecli.netlify.app/login",
@@ -100,8 +98,91 @@ export const projects: Project[] = [
     metrics: [
       { label: "API · CLI · Web", value: "3 clients" },
       { label: "Owner/Admin/Member", value: "RBAC" },
-      { label: "Drag & drop", value: "Kanban" },
+      { label: "Integration tests", value: "66" },
     ],
     accent: "#F5A524",
+  },
+  {
+    id: "auth-system",
+    index: "03",
+    title: "Auth System",
+    tagline: "Advanced authentication & authorization",
+    description:
+      "Access/refresh tokens, Google/GitHub/Facebook login, TOTP-based 2FA, password reset, account linking and rate limiting — built on Spring Boot 3.",
+    year: "2025",
+    role: "Full-Stack Developer",
+    repoUrl: "https://github.com/Hmmzza12/Advanced-authentification-system",
+    stack: [
+      "Java 17",
+      "Spring Boot 3",
+      "React",
+      "OAuth2",
+      "JWT",
+      "TOTP",
+    ],
+    apiRoutes: [
+      { method: "POST", path: "/api/auth/register", note: "Create account with email verification" },
+      { method: "POST", path: "/api/auth/login", note: "Issues JWT access + refresh pair" },
+      { method: "POST", path: "/api/auth/oauth/:provider", note: "Google / GitHub / Facebook OAuth" },
+      { method: "POST", path: "/api/auth/2fa/setup", note: "Enable TOTP-based two-factor auth" },
+      { method: "POST", path: "/api/auth/password/reset", note: "Password reset via email link" },
+      { method: "PUT", path: "/api/auth/account/link", note: "Link additional OAuth provider" },
+    ],
+    authFlow: [
+      "User registers with email or OAuth provider",
+      "Password hashed with bcrypt, email verified",
+      "Login issues JWT access + refresh token pair",
+      "Optional TOTP 2FA verification on login",
+      "OAuth providers (Google, GitHub, Facebook) linkable",
+      "Rate limiting protects all auth endpoints",
+    ],
+    metrics: [
+      { label: "OAuth providers", value: "3" },
+      { label: "Password + TOTP", value: "2FA" },
+      { label: "Spring Boot 3", value: "Java 17" },
+    ],
+    accent: "#8B5CF6",
+  },
+  {
+    id: "devmetrics",
+    index: "04",
+    title: "DevMetrics",
+    tagline: "GitHub analytics dashboard",
+    description:
+      "OAuth-based GitHub analytics with background data synchronization, activity metrics and encrypted token storage.",
+    year: "2025",
+    role: "Full-Stack Developer",
+    liveUrl: "https://devmetrics-beta.vercel.app",
+    repoUrl: "https://github.com/Hmmzza12/DevMetrics",
+    stack: [
+      "TypeScript",
+      "Fastify",
+      "GitHub GraphQL",
+      "Turso",
+      "React",
+      "Tailwind CSS",
+    ],
+    apiRoutes: [
+      { method: "GET", path: "/api/auth/github", note: "Initiates GitHub OAuth flow" },
+      { method: "GET", path: "/api/metrics/:username", note: "Aggregated GitHub analytics" },
+      { method: "POST", path: "/api/sync", note: "Triggers background data sync" },
+      { method: "GET", path: "/api/activity", note: "Commit patterns and streaks" },
+      { method: "GET", path: "/api/languages", note: "Language usage breakdown" },
+      { method: "GET", path: "/api/repos", note: "Repository statistics" },
+    ],
+    authFlow: [
+      "GitHub OAuth initiates authorization redirect",
+      "Callback exchanges code for access token",
+      "Token encrypted at rest with AES-256",
+      "Background sync fetches GitHub GraphQL data",
+      "Metrics computed and cached in Turso",
+      "Session persisted with httpOnly cookie",
+    ],
+    metrics: [
+      { label: "GitHub GraphQL", value: "OAuth" },
+      { label: "Background sync", value: "Real-time" },
+      { label: "Encrypted tokens", value: "AES-256" },
+    ],
+    accent: "#10B981",
   },
 ];

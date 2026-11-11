@@ -193,16 +193,18 @@ function ProjectCard({ project }: { project: Project }) {
 
         {/* Actions: Live · Code · Architecture */}
         <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-6">
-          <a
-            href={project.liveUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 font-mono text-sm font-semibold transition-all hover:shadow-glow"
-            style={{ backgroundColor: project.accent, color: "#0A0A0C" }}
-          >
-            <ExternalLink className="h-4 w-4" />
-            Live Demo
-          </a>
+          {project.liveUrl && (
+            <a
+              href={project.liveUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-lg px-4 py-2.5 font-mono text-sm font-semibold transition-all hover:shadow-glow"
+              style={{ backgroundColor: project.accent, color: "#0A0A0C" }}
+            >
+              <ExternalLink className="h-4 w-4" />
+              Live Demo
+            </a>
+          )}
           <a
             href={project.repoUrl}
             target="_blank"

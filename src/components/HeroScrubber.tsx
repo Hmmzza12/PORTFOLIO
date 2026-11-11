@@ -201,7 +201,7 @@ export default function HeroScrubber() {
             </div>
 
             <p className="mt-6 font-mono text-sm tracking-[0.2em] text-muted">
-              SPRING BOOT · REACT · TYPESCRIPT
+              REACT · NODE.JS · TYPESCRIPT · SPRING BOOT
             </p>
           </motion.div>
         </div>
@@ -222,8 +222,8 @@ export default function HeroScrubber() {
               Hi, I&apos;m Hamza Touaban.
             </h2>
             <p className="mx-auto mt-5 max-w-xl font-body text-lg text-ink/80 text-balance">
-              Full-stack engineer architecting bulletproof backends and
-              high-performance, cinematic web applications.
+              Software engineer building web applications with React,
+              Node.js, TypeScript, Java/Spring Boot and SQL databases.
             </p>
           </div>
         </div>
@@ -244,9 +244,9 @@ export default function HeroScrubber() {
               Full-stack architecture, end to end
             </h2>
             <p className="mx-auto mt-5 max-w-xl font-body text-lg text-ink/80 text-balance">
-              From JWT-authenticated Spring Boot APIs to fluid React
-              frontends—I craft robust systems from database schema to final
-              pixel.
+              From JWT-authenticated REST APIs to fluid React
+              frontends — I build robust systems from database schema
+              to final pixel.
             </p>
           </div>
         </div>
